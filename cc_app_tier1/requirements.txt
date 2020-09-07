@@ -1,0 +1,7 @@
+flask==1.1.2
+pymongo
+requests
+timezonefinder
+dnspython
+pytz
+git+https://github.com/m-wrzr/populartimes

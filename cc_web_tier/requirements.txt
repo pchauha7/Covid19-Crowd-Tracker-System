@@ -1,0 +1,12 @@
+flask==1.1.2
+Flask-WTF
+WTForms
+Werkzeug==0.16.1
+itsdangerous
+requests
+timezonefinder
+click
+Jinja2
+MarkupSafe
+flask-googlemaps
+pytz

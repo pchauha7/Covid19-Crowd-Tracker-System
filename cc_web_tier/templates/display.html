@@ -1,0 +1,185 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!--<h2> Welcome </h2>-->
+
+<form action="" method="post">
+
+<!--        <input type="radio" name="qtype" id="option1" value="restaurant"> Restaurant </input><br>-->
+<!--        <input type="radio" name="qtype" id="option2" value="store"> Superstore </input><br>-->
+<!--        <label for="abc">Write some text<span style="color: red;">*</span></label>-->
+    <div class="row">
+        <div class="form-check">
+            <label>Select the place of visit:</label>
+            <div class="tgl-radio-tabs">
+                <input id="x" type="radio" checked = "checked" class="form-check-input tgl-radio-tab-child" name="qtype" value="restaurant"><label for="x" class="radio-inline">Restaurants</label>
+                <input id="y" type="radio" class="form-check-input tgl-radio-tab-child" name="qtype" value="store"><label for="y" class="radio-inline">Store</label>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <label class="time-label">Time to visit:</label>
+        <label class="time-container time-now" id = "time-now">Right Now
+          <input type="radio" checked="checked" name="visitTime">
+          <span class="checkmark"></span>
+        </label>
+        <label class="time-container time-later" id = "time-later">Later
+          <input type="radio" name="visitTime">
+          <span class="checkmark"></span>
+        </label>
+
+        <div id="date-time-wrapper">
+            <label for="">Time: </label>
+            <input type="time" id="hour" name="hour">
+            <label for="">Date: </label>
+            <input type="date" id="day" name="day">
+        </div>
+    </div>
+    <div class = "row">
+        <div class="form-check col-sm-6">
+            <label for="pac-input">Store/Restaurant address:</label>
+            <input id="pac-input" required name="location" class="controls form-control" type="text" placeholder="Search">
+        </div>
+        <div class="col-sm-6">
+            <div class="form-group">
+                  <label for="dist-select">Select maximum distance(in miles)</label>
+                  <select class="form-control" id="dist-select" name="range">
+                    <option>1</option>
+                    <option>2</option>
+                    <option>3</option>
+                    <option>4</option>
+                      <option>5</option>
+                  </select>
+                </div>
+        </div>
+    </div>
+
+
+
+    <div id="map"></div>
+    <div id="infowindow-content">
+        <input type="hidden" id="placeId" name="placeId">
+    </div>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDqTfUSdNupIB5Yq-tTqI0UzV7jTs5DPn4&libraries=places&callback=initMap"
+        async defer></script>
+    <script>
+
+    var laterElem = document.getElementById("time-later");
+    var dateTimeElem = document.getElementById("date-time-wrapper")
+    hourElem = document.getElementById("hour")
+    dayElem = document.getElementById("day")
+    laterElem.addEventListener("click", function(e){
+        dateTimeElem.style.display = "inline-block";
+        hourElem.setAttribute("required", "true")
+        dayElem.setAttribute("required", "true")
+    })
+    var nowElem = document.getElementById("time-now");
+    nowElem.addEventListener("click", function(e){
+        dateTimeElem.style.display = "none";
+        document.getElementById("day").value = "";
+        document.getElementById("hour").value = "";
+        hourElem.removeAttribute("required")
+        dayElem.removeAttribute("required")
+    })
+      // This example adds a search box to a map, using the Google Place Autocomplete
+      // feature. People can enter geographical searches. The search box will return a
+      // pick list containing a mix of places and predicted search terms.
+
+      // This example requires the Places library. Include the libraries=places
+      // parameter when you first load the API. For example:
+      // <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places">
+
+
+        function initMap() {
+          var map = new google.maps.Map(document.getElementById('map'), {
+            center: {lat: -33.8688, lng: 151.2195},
+            zoom: 13
+          });
+
+          var input = document.getElementById('pac-input');
+
+          var autocomplete = new google.maps.places.Autocomplete(input);
+          autocomplete.bindTo('bounds', map);
+
+          // Specify just the place data fields that you need.
+          autocomplete.setFields(
+              ['place_id', 'geometry', 'name', 'formatted_address']);
+
+          map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
+
+          var infowindow = new google.maps.InfoWindow();
+          var infowindowContent = document.getElementById('infowindow-content');
+          infowindow.setContent(infowindowContent);
+
+          var marker = new google.maps.Marker({map: map});
+
+          marker.addListener('click', function() {
+            infowindow.open(map, marker);
+          });
+
+          autocomplete.addListener('place_changed', function() {
+            infowindow.close();
+
+            var place = autocomplete.getPlace();
+            //document.getElementById(placeId).value = place.place_id
+            if (!place.geometry) {
+              return;
+            }
+
+            if (place.geometry.viewport) {
+              map.fitBounds(place.geometry.viewport);
+            } else {
+              map.setCenter(place.geometry.location);
+              map.setZoom(17);
+            }
+
+            // Set the position of the marker using the place ID and location.
+            marker.setPlace({
+              placeId: place.place_id,
+              location: place.geometry.location
+            });
+
+            marker.setVisible(true);
+
+            infowindowContent.children['placeId'].value = place.place_id;
+            infowindow.open(map, marker);
+            //console.log(infowindowContent.children['placeId'].innerHTML)
+            console.log(infowindowContent)
+          });
+        }
+
+        function validDate(){
+            var today = new Date().toISOString().split('T')[0];
+            var nextWeekDate = new Date(new Date().getTime() + 6 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+          document.getElementsByName("day")[0].setAttribute('min', today);
+          document.getElementsByName("day")[0].setAttribute('max', nextWeekDate)
+        }
+        validDate()
+    </script>
+
+<!--    <p>-->
+<!--        {{form.range.label}} <br>-->
+<!--        {{form.range(size=100)}}-->
+<!--    </p>-->
+
+<!--    <p>-->
+<!--&lt;!&ndash;        {{form.timeToVsit.label}} <br>&ndash;&gt;-->
+<!--&lt;!&ndash;        {{form.timeToVsit(size=30)}}&ndash;&gt;-->
+<!--        <label for="timeToVisit">Time to visit:</label>-->
+<!--        <input type="time" id="timeToVisit" name="timeToVisit"> <br>-->
+        <!--<label for="dateToVisit">Date to visit:</label>-->
+
+
+<!--    </p>-->
+
+
+
+    <div class="row">
+        {{form.submit()}} <br>
+
+    </div>
+    </form>
+
+
+
+{% endblock %}

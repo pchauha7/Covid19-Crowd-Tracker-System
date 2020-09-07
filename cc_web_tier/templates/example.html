@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+    <script src = "https://use.fontawesome.com/5e297cbed2.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <head>
+    {{"decoupled-map"|googlemap_js(33.4166117, -111.9235453, markers=[(33.4166117,
+    -111.9235453)])}} {{mymap.js}} {{sndmap.js}}
+  </head>
+ <body>
+ <div class="container-fluid">
+     <div class="home">
+        <a href="/icms"><i class="fa fa-arrow-left"></i> Home</a>
+     </div>
+    <h2 class="qtype-heading"> {{ qtype }} you can visit </h2>
+
+    <div class="content-wrapper row">
+        <div class="col-sm-3">
+            <div class="qtype-result">
+                {% if firstResult %}
+                <p class="qtype-name">{{firstResult.Name}}</p>
+                <p class="qtype-address"> {{firstResult.Address}}</p>
+                {% if firstResult.PlaceSafety|length > 3 %}
+
+                    {% for i in firstResult.PlaceSafety[:3] %}
+                    <p class="qtype-safety">
+                        <span>{{i[0]}}</span> -
+                        {% if i[1] == "Very Safe" %}
+                        <span class = "green">{{i[1]}}</span>
+                        {% elif i[1] == "Safe" %}
+                        <span class="orange">{{i[1]}}</span>
+                        {% else %}
+                        <span class="red">{{i[1]}}</span>
+                        {% endif %}
+                    </p>
+                    {% endfor %}
+                    <div id = "see-more">
+                        {% for i in firstResult.PlaceSafety[3:] %}
+                        <p class="qtype-safety see-more">
+                            <span>{{i[0]}}</span> -
+                            {% if i[1] == "Very Safe" %}
+                            <span class = "green">{{i[1]}}</span>
+                            {% elif i[1] == "Safe" %}
+                            <span class="orange">{{i[1]}}</span>
+                            {% else %}
+                            <span class="red">{{i[1]}}</span>
+                            {% endif %}
+                        </p>
+                        {% endfor %}
+                    </div>
+
+                <a href="#" id="see-more-link">See More</a>
+                <a href="#" id="see-less-link">See Less</a>
+                 {% else %}
+                    {% for i in firstResult.PlaceSafety[:firstResult.PlaceSafety|length] %}
+                    <p class="qtype-safety">
+                        <span>{{i[0]}}</span> -
+                        {% if i[1] == "Very Safe" %}
+                        <span class = "green">{{i[1]}}</span>
+                        {% elif i[1] == "Safe" %}
+                        <span class="orange">{{i[1]}}</span>
+                        {% else %}
+                        <span class="red">{{i[1]}}</span>
+                        {% endif %}
+                    </p>
+                    {% endfor %}
+                 {% endif %}
+                <p class="qtype-rating"><b>Rating -</b> {{firstResult.Rating}}</p>
+                <p class="qtype-status"><b>OpenNow -</b> {{firstResult.OpenNow}}</p>
+                {% endif %}
+                 {% if message %}
+                <h5 class="invalid-msg  "><i class="fa fa-exclamation-triangle"></i> {{ message }}</h5>
+                {% endif %}
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <div id="map2" style="width: 100%; height: 100%">
+                {{sndmap.html}}
+            </div>
+        </div>
+        <div class="col-sm-3">
+            <h5>Recommended for you</h5>
+            <ul class="qtype-list">
+            {% for stores in recommendations %}
+                <li class="qtype-content-wrapper">
+                    <p class="qtype-name">{{stores.Name}}</p>
+                    <p class="qtype-address"> {{stores.Address}}</p>
+                    <p class="qtype-safety">
+                        {% if stores.PlaceSafety == "Very Safe" %}
+                        <span class = "green">{{stores.PlaceSafety}}</span>
+                        {% elif stores.PlaceSafety == "Safe" %}
+                        <span class="orange">{{stores.PlaceSafety}}</span>
+                        {% else %}
+                        <span class="red">{{stores.PlaceSafety}}</span>
+                        {% endif %}
+                    </p>
+                    <p class="qtype-rating"><b>Rating-</b> {{stores.Rating}}</p>
+                    <p class="qtype-status"><b>OpenNow -</b> {{stores.OpenNow}}</p>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    </div>
+
+ <script>
+    seeMoreLink = document.getElementById("see-more-link")
+    seeMoreSection = document.getElementById("see-more")
+    seeLessLink = document.getElementById("see-less-link")
+    seeMoreLink.addEventListener("click", function(){
+        seeMoreSection.style.display = "inline-block";
+        seeLessLink.style.display = "inline-block";
+        seeMoreLink.style.display = "none";
+    })
+    seeLessLink.addEventListener("click", function(){
+        seeMoreSection.style.display = "none";
+        seeLessLink.style.display = "none";
+        seeMoreLink.style.display = "inline-block";
+    })
+ </script>
+  </body>
+</html>
+
